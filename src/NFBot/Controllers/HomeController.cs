@@ -25,18 +25,18 @@ namespace NFBot.Controllers
 
 		#endregion
 
-		//[HttpPost]
-		public async Task<IActionResult> NFFEnterPoint(/*[FromBody]RequestModel model*/)
+		[HttpPost]
+		public async Task<IActionResult> NFFEnterPoint([FromBody]RequestModel model)
 		{
-			RequestModel model = new RequestModel
-			{
-				RequestObject = new RequestObject
-				{
-					Body = "знакомства",
-					UserId = 1
-				},
-				Type = "message_new"
-			};
+			//RequestModel model = new RequestModel
+			//{
+			//	RequestObject = new RequestObject
+			//	{
+			//		Body = "hello",
+			//		UserId = 1
+			//	},
+			//	Type = "message_new"
+			//};
 
 			// Handle only new messages.
 			if (model.Type != "message_new")
@@ -49,22 +49,36 @@ namespace NFBot.Controllers
 			// Save answer for user.
 			//this.testManagement.SaveAnswer(model.Message);
 			string nextQuestion = null;
+			TestStatus newStatus;
 
 			Test test = this.testManagement.GetCurrentTest(model.UserId);
 
 			if (test == null)
 			{
-				var tests = this.testManagement.GetAllTests();
+				Test testByCode = this.testManagement.GetTestByCode(model.Message);
+				if (testByCode == null)
+				{
 
-				nextQuestion = string.Join("\n", tests.Select(t => t.Code));
+					var tests = this.testManagement.GetAllTests();
+
+					nextQuestion = string.Join("\n", tests.Select(t => t.Code));
+
+				}
+				else
+				{
+					this.userComponent.SetupCurrentTest(model.UserId, testByCode.Id);
+
+					TestHandlerAbstraction handler = TestFactory.GetTestHandler(model.Message, testByCode, null);
+
+					nextQuestion = handler.NextQuestion(out newStatus);
+				}
 			}
 			else
 			{
-				nextQuestion = this.GetNextQuestion(test.Status);
+				nextQuestion = this.GetNextQuestion(test);
 			}
-			TestStatus newStatus;
 
-			
+
 
 			// Extract next question from the test
 			//string nextQuestion = test.TestObject;
@@ -79,11 +93,11 @@ namespace NFBot.Controllers
 			return Ok("ok");
 		}
 
-		private string GetNextQuestion(TestStatus status)
+		private string GetNextQuestion(Test test)
 		{
-			string result  = string.Empty;
+			string result = string.Empty;
 
-			switch (status)
+			switch (test.Status)
 			{
 				//case TestStatus.Undefined:
 				//	{

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using NFBot.Infrastructure.DBComponents;
 
 namespace NFBot
 {
@@ -49,6 +50,12 @@ namespace NFBot
             app.UseMvc();
 
             app.UseMvcWithDefaultRoute();
+
+            SqliteDbRepository rep = new SqliteDbRepository();
+            rep.CreateUserTable();
+            rep.CreateTestResultTable();
+            rep.CreateTestTable();
+            rep.InitTests();
         }
     }
 }

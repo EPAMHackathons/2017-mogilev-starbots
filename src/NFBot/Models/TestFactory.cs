@@ -21,7 +21,7 @@ namespace NFBot.Models
             if (name == "кино")
             {
                 return new MoveTestHandler(test, results);
-            }
+            } 
 
             return null;
         }

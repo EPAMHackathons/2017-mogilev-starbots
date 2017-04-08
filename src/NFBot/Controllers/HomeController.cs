@@ -1,20 +1,24 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using NFBot.Infrastructure;
-using NFBot.Models;
-using System.Linq;
-using System.Threading.Tasks;
-using NFBot.Interfaces;
-using NFBot.Models.DatabaseModel;
 
 namespace NFBot.Controllers
 {
+	#region Usings
+
+	using System.Threading.Tasks;
+	using NFBot.Infrastructure;
+	using NFBot.Interfaces;
+	using NFBot.Models;
+	using NFBot.Models.DatabaseModel;
+
+	#endregion
+
 	public class HomeController : Controller
 	{
 		#region Private Fields
 
 		private ITestManagementComponent testManagement;
 
+		private IUserComponent userComponent;
 
 		#endregion
 
@@ -28,22 +32,25 @@ namespace NFBot.Controllers
 			}
 
 			// Check whether user is exist. If not - create new.
-			long internalId = this.testManagement.UpdateUser(model.RequestObject.UserId);
+			bool userExists = this.userComponent.CheckUser(model.UserId);
 
-
+			if (!userExists)
+			{
+				this.userComponent.CreateUser(new User(model.UserId));
+			}
 
 			// Save answer for user.
-			this.testManagement.SaveAnswer(model.RequestObject.Body);
+			this.testManagement.SaveAnswer(model.Message);
 
-			Test test = this.testManagement.GetCurrentTest(model.RequestObject.UserId);
+			Test test = this.testManagement.GetCurrentTest(model.UserId);
 
 			// Extract next question from the test
 			string nextQuestion = test.TestObject;
 
-			string message = "You said " + model.RequestObject.Body + nextQuestion;
+			string message = "You said " + model.Message + nextQuestion;
 
 			// Send answer to the user.
-			var resp = new ResponseObject(message, model.RequestObject.UserId);
+			var resp = new ResponseObject(message, model.UserId);
 
 			await new RequestHandler().SendRequest(resp);
 

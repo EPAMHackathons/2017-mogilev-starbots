@@ -1,11 +1,30 @@
 ﻿namespace NFBot.Models.DatabaseModel
 {
-    public class User
-    {
-        public int UserId { get; set; }
+	public class User
+	{
+		#region Constructors
 
-        public string City { get; set; }
+		/// <summary>
+		/// Initializes a new instance of the <see cref="User" /> class.
+		/// </summary>
+		public User()
+		{
+		}
 
-        public int CurrentTestId { get; set; }
-    }
+		/// <summary>
+		/// Initializes a new instance of the <see cref="User" /> class.
+		/// </summary>
+		public User(int userId)
+		{
+			this.UserId = userId;
+		}
+
+		#endregion
+
+		public int UserId { get; set; }
+
+		public string City { get; set; }
+
+		public int CurrentTestId { get; set; }
+	}
 }

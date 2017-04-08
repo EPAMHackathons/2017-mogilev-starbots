@@ -14,5 +14,23 @@ namespace NFBot.Models
 
 		[JsonProperty("object")]
 		public RequestObject RequestObject { get; set; }
+
+		[JsonIgnore]
+		public string Message
+		{
+			get
+			{
+				return this.RequestObject.Body;
+			}
+		}
+
+		[JsonIgnore]
+		public int UserId
+		{
+			get
+			{
+				return this.RequestObject.UserId;
+			}
+		}
 	}
 }

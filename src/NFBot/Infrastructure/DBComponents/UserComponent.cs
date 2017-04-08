@@ -1,34 +1,50 @@
-﻿
+
+﻿using NFBot.Models.DatabaseModel;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace NFBot.Infrastructure.DBComponents
 {
-	#region Usings
+    public class UserComponent
+    {
+        private SqliteDbRepository _repository;
 
-	using System.Collections.Generic;
-	using Interfaces;
-	using NFBot.Models.DatabaseModel;
+        public UserComponent()
+        {
+            _repository = new SqliteDbRepository();
+        }
 
-	#endregion
+        public void CreateUser(User user)
+        {
+            if (user == null) throw new ArgumentNullException("user");
+            _repository.InsertUser(user.UserId, user.City, user.CurrentTestId);
+        }
 
-	public class UserComponent : IUserComponent
-	{
-		public void CreateUser(User user)
-		{
+        public void SetupCurrentTest(int userId, int testId)
+        {
+            List<User> users = GetAllUsers();
+            var currentUser = users.First(u => u.UserId == userId);
 
-		}
+            if (currentUser != null)
+                _repository.UpdateUser(currentUser.UserId, currentUser.City, currentUser.CurrentTestId);
+        }
 
-		public void SetupCurrentTest(int userId, int testId)
-		{
+        public List<User> GetAllUsers()
+        {
+            return _repository.GetUsers();
+        }
 
-		}
+        public bool CheckUser(int userId)
+        {
+            var users = _repository.GetUsers();
 
-		public List<User> GetAllUsers()
-		{
-			return null;
-		}
+            if (users != null)
+            {
+                return users.Exists(u => u.UserId == userId);
+            }
 
-		public bool CheckUser(int userId)
-		{
-			return false;
-		}
-	}
+            return false;
+        }
+    }
 }

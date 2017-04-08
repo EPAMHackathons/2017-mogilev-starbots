@@ -7,9 +7,13 @@ namespace NFBot.Models.CompabilityModel
 {
     public class TestModel
     {
-        public int Id { get; set; }
-
-        public string Code { get; set; }
+        public static TestModel Init()
+        {
+            TestModel model = new TestModel();
+            model.Name = "знакомства";
+            model.Questions = QuestionModel.Init();
+            return model;
+        }
 
         public string Name { get; set; }
 

@@ -1,5 +1,8 @@
 ﻿using Microsoft.Data.Sqlite;
 using NFBot.Models.DatabaseModel;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace NFBot.Infrastructure.DBComponents
 {
@@ -56,6 +59,43 @@ namespace NFBot.Infrastructure.DBComponents
 			command.Parameters.AddWithValue("@CurrentTest", currentTest);
 
 			ExecuteNonQueryCommand(command);
+		}
+
+		public void UpdateUser(int id, string city, int currentTest)
+		{
+			string commandText = @"UPDATE USER SET CITY = @City WHERE ID = @Id; UPDATE USER SET CURRENT_TEST = @CurrentTest WHERE ID = @Id;";
+			var command = Connection.CreateCommand();
+			command.CommandText = commandText;
+			command.Parameters.AddWithValue("@Id", id);
+			command.Parameters.AddWithValue("@City", city);
+			command.Parameters.AddWithValue("@CurrentTest", currentTest);
+
+			ExecuteNonQueryCommand(command);
+		}
+
+		public List<User> GetUsers()
+		{
+			var result = new List<User>();
+
+			const string commandText = @"SELECT * FROM USER;";
+
+			var command = Connection.CreateCommand();
+			command.CommandText = commandText;
+
+			Connection.Open();
+			var resultReader = command.ExecuteReader();
+			while(resultReader.Read())
+			{
+				result.Add(new User
+				{
+					UserId = int.Parse(resultReader["ID"].ToString()),
+					City = resultReader["CITY"].ToString(),
+					CurrentTestId = int.Parse(resultReader["CURRENT_TEST"].ToString())
+				}
+				);
+			}
+
+			return result;
 		}
 
 		#region DDL Statements

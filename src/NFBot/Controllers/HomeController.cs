@@ -4,30 +4,50 @@ using NFBot.Infrastructure;
 using NFBot.Models;
 using System.Linq;
 using System.Threading.Tasks;
+using NFBot.Interfaces;
+using NFBot.Models.DatabaseModel;
 
 namespace NFBot.Controllers
 {
-    public class HomeController : Controller
-    {
+	public class HomeController : Controller
+	{
+		#region Private Fields
 
-        [HttpPost]
-        public async Task<IActionResult> NFFEnterPoint([FromBody]RequestModel model)
-        {
-            if (model.type == "confirmation")
-            {
-                return Ok("7c030779");
-            }
-            else if (model.type == "message_new")
-            {
-                var userId = model.@object.UserId;
-                string message = model.@object.Body.Trim().Replace(" ", "").ToLower();
+		private ITestManagementComponent testManagement;
 
-                ResponseObject resp = new ResponseObject() { Message = message, UserId = userId };
 
-                await new RequestHandler().SendRequest(resp);
-            }
+		#endregion
 
-            return Ok("ok");
-        }
-    }
+		[HttpPost]
+		public async Task<IActionResult> NFFEnterPoint([FromBody]RequestModel model)
+		{
+			// Handle only new messages.
+			if (model.Type != "message_new")
+			{
+				return Ok("ok");
+			}
+
+			// Check whether user is exist. If not - create new.
+			long internalId = this.testManagement.UpdateUser(model.RequestObject.UserId);
+
+
+
+			// Save answer for user.
+			this.testManagement.SaveAnswer(model.RequestObject.Body);
+
+			Test test = this.testManagement.GetCurrentTest(model.RequestObject.UserId);
+
+			// Extract next question from the test
+			string nextQuestion = test.TestObject;
+
+			string message = "You said " + model.RequestObject.Body + nextQuestion;
+
+			// Send answer to the user.
+			var resp = new ResponseObject(message, model.RequestObject.UserId);
+
+			await new RequestHandler().SendRequest(resp);
+
+			return Ok("ok");
+		}
+	}
 }

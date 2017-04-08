@@ -1,9 +1,18 @@
-﻿namespace NFBot.Models
+﻿
+namespace NFBot.Models
 {
-    public class RequestModel
-    {
-        public string type { get; set; }
+	#region Usings
 
-        public RequestObject @object { get; set; }
-    }
+	using Newtonsoft.Json;
+
+	#endregion
+
+	public class RequestModel
+	{
+		[JsonProperty("type")]
+		public string Type { get; set; }
+
+		[JsonProperty("object")]
+		public RequestObject RequestObject { get; set; }
+	}
 }

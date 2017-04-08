@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NFBot.Infrastructure.DBComponents
 {
-    public class TestComponent
+    public class TestComponent: ITestComponent
     {
         public List<Test> GetAllTests()
         {

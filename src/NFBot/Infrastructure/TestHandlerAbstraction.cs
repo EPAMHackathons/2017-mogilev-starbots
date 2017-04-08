@@ -9,14 +9,6 @@ namespace NFBot.Infrastructure
 {
     public abstract class TestHandlerAbstraction
     {
-        protected Test testModel;
-        protected TestResult testResultModel;
-        public TestHandlerAbstraction(Test testModel, TestResult testResultModel)
-        {
-            this.testModel = testModel;
-            this.testResultModel = testResultModel;
-        }
-
         public abstract AnswerStatus AddNewAnswer(string answer);
 
         public abstract string NextQuestion(out TestStatus status);

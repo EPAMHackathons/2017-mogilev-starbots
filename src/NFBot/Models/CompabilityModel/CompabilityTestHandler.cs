@@ -11,17 +11,22 @@ namespace NFBot.Models.CompabilityModel
     public class CompabilityTestHandler : TestHandlerAbstraction
     {
         public TestResultModel results;
-
-        public CompabilityTestHandler(Test testModel, TestResult testResultModel) : base(testModel, testResultModel)
+        protected Test testModel;
+        protected TestResult testResultModel;
+        public CompabilityTestHandler(Test testModel, TestResult testResultModel) 
         {
+            this.testModel = testModel;
             if (testResultModel == null)
             {
-                testResultModel = new TestResult()
+                this.testResultModel = new TestResult()
                 {
                     IsFinished = false,
                     TestId = testModel.Id,
                     Result = null
                 };
+            }else
+            {
+                this.testResultModel = testResultModel;
             }
         }
 
@@ -30,7 +35,7 @@ namespace NFBot.Models.CompabilityModel
             if (string.IsNullOrWhiteSpace(this.testResultModel.Result))
             {
                 results = new TestResultModel() { Answers = "" };
-                this.testResultModel = new TestResult();
+                this.testResultModel.Result = JsonConvert.SerializeObject(results);
                 return AnswerStatus.Correct;
             }
             else
@@ -39,6 +44,7 @@ namespace NFBot.Models.CompabilityModel
                 {
                     results = JsonConvert.DeserializeObject<TestResultModel>(this.testResultModel.Result);
                     results.Answers += answer;
+                    this.testResultModel.Result = JsonConvert.SerializeObject(results);
                     return AnswerStatus.Correct;
                 }
             }
@@ -66,17 +72,18 @@ namespace NFBot.Models.CompabilityModel
 
         public override string NextQuestion(out TestStatus status)
         {
-            var test = JsonConvert.DeserializeObject<TestModel>(this.testResultModel.Result);
+            results = JsonConvert.DeserializeObject<TestResultModel>(this.testResultModel.Result);
+            var test = JsonConvert.DeserializeObject<TestModel>(this.testModel.TestObject);
             if (test.Questions.Count > results.Answers.Length)
             {
                 status = TestStatus.Continue;
                 return test.Questions[results.Answers.Length].ToString();
             }
 
-            if (test.Questions.Count + 1 == results.Answers.Length)
+            if (test.Questions.Count == results.Answers.Length)
             {
                 string resultCode = Analysis();
-                string message = test.Description.Where(m => m.Code == resultCode.Trim().ToUpper()).FirstOrDefault().Description;
+                string message = test.Description.Where(m => m.Code==resultCode).FirstOrDefault().Description;
                 message += "---Есть следующие комбинации. Выбери подходящую для себя.---";
 
                 foreach (var item in test.Compare)
@@ -111,7 +118,7 @@ namespace NFBot.Models.CompabilityModel
         {
             string[] answers = new string[] { "А", "Б", "В", "Г", "Д", "Е" };
 
-            return answers.Contains(answer.Trim().ToUpper());
+            return answers.Any(m=>m==answer.Trim().ToUpper());
         }
     }
 }

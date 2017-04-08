@@ -11,7 +11,7 @@ namespace NFBot.Models.CompabilityModel
         {
             List<TestDescriptionResults> result = new List<TestDescriptionResults>();
 
-            result.Add( new TestDescriptionResults() { Code = "A", Description = @"АГРЕССОР
+            result.Add( new TestDescriptionResults() { Code = "А", Description = @"АГРЕССОР
 Вы - агрессор(преимущественно мужской тип).Сила, власть и напор, граничащие с грубостью, -вот ваш стиль в любви.Вы не признаете недомолвок, намеков, предпочитая действовать открыто и прямолинейно.Ваше сексуальное начало похоже на вулкан - завораживает, как любое проявление дикой природы, но может испепелить огнедышащей лавой." });
 
             result.Add(new TestDescriptionResults() { Code = "Б", Description = @"ИНТЕЛЛЕКТУАЛ

@@ -36,7 +36,7 @@ namespace NFBot.Controllers
 			this.CheckUser(model);
 
 			// Save answer for user.
-			this.testManagement.SaveAnswer(model.Message);
+			//this.testManagement.SaveAnswer(model.Message);
 
 			Test test = this.testManagement.GetCurrentTest(model.UserId);
 
@@ -114,7 +114,8 @@ namespace NFBot.Controllers
 
 		static int userId = 10;
 
-		public string Index()
+
+		private string Index()
 		{
 			CompabilityTestHandler handler = new CompabilityTestHandler(new Test() { Code = "", TestObject = TestModel.Init(), Id = 1, Name = "знакомства" }, null);
 

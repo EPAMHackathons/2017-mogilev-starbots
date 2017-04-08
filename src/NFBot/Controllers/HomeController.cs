@@ -4,27 +4,43 @@ using NFBot.Infrastructure;
 using NFBot.Models;
 using System.Linq;
 using System.Threading.Tasks;
+using NFBot.Interfaces;
+using NFBot.Models.DatabaseModel;
 
 namespace NFBot.Controllers
 {
 	public class HomeController : Controller
 	{
+		#region Private Fields
+
+		private ITestManagementComponent testManagement;
+
+
+		#endregion
 
 		[HttpPost]
 		public async Task<IActionResult> NFFEnterPoint([FromBody]RequestModel model)
 		{
-			if (model.Type == "confirmation")
+			// Handle only new messages.
+			if (model.Type != "message_new")
 			{
-				return Ok("7c030779");
+				return Ok("ok");
 			}
-			else if (model.Type == "message_new")
-			{
-				string message = "You said " + model.RequestObject.Body;
 
-				var resp = new ResponseObject(message, model.RequestObject.UserId);
+			// Check whether user is exist. If not - create new.
+			this.testManagement.UpdateUser(model.RequestObject.UserId);
 
-				await new RequestHandler().SendRequest(resp);
-			}
+			Test test = this.testManagement.GetCurrentTest(model.RequestObject.UserId);
+
+			// Extract next question from the test
+			string nextQuestion = test.TestObject;
+
+			string message = "You said " + model.RequestObject.Body + nextQuestion;
+
+			// Send answer to the user.
+			var resp = new ResponseObject(message, model.RequestObject.UserId);
+
+			await new RequestHandler().SendRequest(resp);
 
 			return Ok("ok");
 		}

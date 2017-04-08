@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using NFBot.Models.DatabaseModel;
 using Newtonsoft.Json;
+using NFBot.Models.Enumerations;
 
 namespace NFBot.Models.CompabilityModel
 {

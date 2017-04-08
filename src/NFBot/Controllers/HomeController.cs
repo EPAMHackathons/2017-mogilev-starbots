@@ -33,21 +33,63 @@ namespace NFBot.Controllers
 				return Ok("ok");
 			}
 
-			// Check whether user is exist. If not - create new.
-			bool userExists = this.userComponent.CheckUser(model.UserId);
-
-			if (!userExists)
-			{
-				this.userComponent.CreateUser(new User(model.UserId));
-			}
+			this.CheckUser(model);
 
 			// Save answer for user.
 			this.testManagement.SaveAnswer(model.Message);
 
 			Test test = this.testManagement.GetCurrentTest(model.UserId);
 
+			TestStatus newStatus;
+			string nextQuestion = null;
+
+			switch (test.Status)
+			{
+				case TestStatus.Undefined:
+					{
+						Test newTest = this.testManagement.GetTestByCode(model.Message);
+
+						if (newTest == null)
+						{
+							nextQuestion = "Incorrect choice. Please, try again.";
+						}
+						else
+						{
+							var handler = new Models.TestFactory().GetTestHandler(model.Message, newTest, null);
+
+							nextQuestion = handler.NextQuestion(out newStatus);
+						}
+
+						//Test newTest = new Test { Code = model.Message, TestObject = TestModel.Init() };
+
+						//var handler = new CompabilityTestHandler(newTest, null);
+						//handler.AddNewAnswer(model.Message);
+
+						//this.userComponent.SetupCurrentTest(model.UserId, test.Id);
+
+						//nextQuestion = handler.NextQuestion(out newStatus);
+						break;
+					}
+				case TestStatus.Finished:
+					{
+						var handler = new CompabilityTestHandler(test, null);
+
+						string analysisResult = handler.Analysis();
+
+						break;
+					}
+				case TestStatus.Continue:
+
+					break;
+				case TestStatus.IncorrectAnswer:
+					nextQuestion = "Incorrect answer - please try again.";
+					break;
+				default:
+					break;
+			}
+
 			// Extract next question from the test
-			string nextQuestion = test.TestObject;
+			//string nextQuestion = test.TestObject;
 
 			string message = "You said " + model.Message + nextQuestion;
 
@@ -57,6 +99,17 @@ namespace NFBot.Controllers
 			await new RequestHandler().SendRequest(resp);
 
 			return Ok("ok");
+		}
+
+		private void CheckUser(RequestModel model)
+		{
+			// Check whether user is exist. If not - create new.
+			bool userExists = this.userComponent.CheckUser(model.UserId);
+
+			if (!userExists)
+			{
+				this.userComponent.CreateUser(new User(model.UserId));
+			}
 		}
 
 		static int userId = 10;

@@ -47,7 +47,21 @@ namespace NFBot.Models.CompabilityModel
 
         public override string Analysis()
         {
-            throw new NotImplementedException();
+            string currentType = "";
+            int maxValue = 0;
+            string[] answers = new string[] { "А", "Б", "В", "Г", "Д", "Е" };
+            foreach (var item in answers)
+            {
+                int i = results.Answers.Where(m => m == item.ToCharArray()[0]).Count();
+
+                if(i > maxValue)
+                {
+                    maxValue = i;
+                    currentType = item;
+                }
+            }
+
+            return currentType;
         }
 
         public override string NextQuestion(out TestStatus status)

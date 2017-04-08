@@ -10,12 +10,12 @@ namespace NFBot.Interfaces
 
 	interface ITestManagementComponent
 	{
-		long UpdateUser(int userExternalId);
-
-		ICollection<User> GetAllUsers();
-
 		ICollection<Test> GetAllTests();
+
 		Test GetCurrentTest(int userId);
+
 		void SaveAnswer(string body);
+
+		Test GetTestByCode(string code);
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
+using NFBot.Models.DatabaseModel;
 
 namespace NFBot.Infrastructure.DBComponents
 {
@@ -44,6 +45,21 @@ namespace NFBot.Infrastructure.DBComponents
 
 		#region Public Interface
 
+		public void InsertUser(int id, string city, int currentTest)
+		{
+			string commandText = @"INSERT OR IGNORE INTO USER ([ID], [CITY], [CURRENT_TEST]) VALUES (@Id, @City, @CurrentTest);";
+
+			var command = Connection.CreateCommand();
+			command.CommandText = commandText;
+			command.Parameters.AddWithValue("@Id", id);
+			command.Parameters.AddWithValue("@City", city);
+			command.Parameters.AddWithValue("@CurrentTest", currentTest);
+
+			ExecuteNonQueryCommand(command);
+		}
+
+		#region DDL Statements
+
 		public void CreateUserTable()
 		{
 			const string commandText = "DROP TABLE IF EXISTS USER; " +
@@ -51,8 +67,10 @@ namespace NFBot.Infrastructure.DBComponents
 									   "ID INTEGER PRIMARY KEY," +
 									   "CITY TEXT," +
 									   "CURRENT_TEST INTEGER);";
+			var command = _connection.CreateCommand();
+			command.CommandText = commandText;
 
-			ExecuteNonQueryCommand(commandText);
+			ExecuteNonQueryCommand(command);
 		}
 
 		public void CreateTestTable()
@@ -64,7 +82,10 @@ namespace NFBot.Infrastructure.DBComponents
 									   "NAME TEXT," +
 									   "TEST TEXT);";
 
-			ExecuteNonQueryCommand(commandText);
+			var command = _connection.CreateCommand();
+			command.CommandText = commandText;
+
+			ExecuteNonQueryCommand(command);
 		}
 
 		public void CreateTestResultTable()
@@ -77,22 +98,23 @@ namespace NFBot.Infrastructure.DBComponents
 									   "RESULT TEXT," +
 									   "IS_FINISHED INTEGER);";
 
-			ExecuteNonQueryCommand(commandText);
+			var command = _connection.CreateCommand();
+			command.CommandText = commandText;
+
+			ExecuteNonQueryCommand(command);
 		}
+
+		#endregion
 
 		#endregion
 
 		#region Internal Implementations
 
-		private void ExecuteNonQueryCommand(string commandText)
+		private void ExecuteNonQueryCommand(SqliteCommand command)
 		{
-			Connection.Open();
-
-			var command = Connection.CreateCommand();
-			command.CommandText = commandText;
-
 			try
 			{
+				Connection.Open();
 				command.ExecuteNonQuery();
 			}
 			finally

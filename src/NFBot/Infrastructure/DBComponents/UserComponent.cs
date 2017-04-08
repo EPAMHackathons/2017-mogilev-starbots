@@ -27,8 +27,10 @@ namespace NFBot.Infrastructure.DBComponents
             List<User> users = GetAllUsers();
             var currentUser = users.First(u => u.UserId == userId);
 
-            if (currentUser != null)
+            if (currentUser != null) {
+                currentUser.CurrentTestId = testId;
                 _repository.UpdateUser(currentUser.UserId, currentUser.City, currentUser.CurrentTestId);
+            }
         }
 
         public List<User> GetAllUsers()

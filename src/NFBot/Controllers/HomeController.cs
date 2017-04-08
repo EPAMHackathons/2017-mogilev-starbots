@@ -28,62 +28,84 @@ namespace NFBot.Controllers
         [HttpPost]
         public async Task<IActionResult> NFFEnterPoint([FromBody]RequestModel model)
         {
-            // = new RequestModel() { Type = "message_new", RequestObject = new RequestObject() { Body = "Привет", UserId = 48416512 } };
+            //RequestModel model = new RequestModel
+            //{
+            //	RequestObject = new RequestObject
+            //	{
+            //		Body = "hello",
+            //		UserId = 1
+            //	},
+            //	Type = "message_new"
+            //};
+
+            // Handle only new messages.
             try
             {
-                // Handle only new messages.
-                if (model.Type != "message_new")
-                {
-                    return Ok("ok");
-                }
 
-                this.CheckUser(model);
+           
+            if (model.Type != "message_new")
+            {
+                return Ok("ok");
+            }
 
-                // Save answer for user.
-                //this.testManagement.SaveAnswer(model.Message);
-                string nextQuestion = null;
+            this.CheckUser(model);
 
-                Test test = this.testManagement.GetCurrentTest(model.UserId);
+            // Save answer for user.
+            //this.testManagement.SaveAnswer(model.Message);
+            string nextQuestion = null;
+            TestStatus newStatus;
 
-                if (test == null)
+            Test test = this.testManagement.GetCurrentTest(model.UserId);
+
+            if (test == null)
+            {
+                Test testByCode = this.testManagement.GetTestByCode(model.Message);
+                if (testByCode == null)
                 {
                     nextQuestion = MessagesConstants.Introduction;
                     var tests = this.testManagement.GetAllTests();
-                    nextQuestion = string.Join("\n", tests.Select(t => t.Code));
+
+                    nextQuestion += string.Join("\n", tests.Select(t => t.Code));
+
                 }
                 else
                 {
-                    nextQuestion = this.GetNextQuestion(test.Status);
+                    this.userComponent.SetupCurrentTest(model.UserId, testByCode.Id);
+
+                        TestHandlerAbstraction handler = TestFactory.GetTestHandler(model.Message, testByCode, null);
+                        handler.AddNewAnswer(model.Message);
+                        nextQuestion = handler.NextQuestion(out newStatus);
                 }
-                TestStatus newStatus;
-
-
-
-                // Extract next question from the test
-                //string nextQuestion = test.TestObject;
-
-                //string message = nextQuestion;
-
-                // Send answer to the user.
-                var resp = new ResponseObject(nextQuestion, model.UserId);
-
-                new RequestHandler().SendRequest(resp);
-
-                return Ok("ok");
-
             }
-            catch (System.Exception e)
+            else
             {
-
-                return Ok(e.Message); ;
+                nextQuestion = this.GetNextQuestion(test);
             }
+
+
+
+            // Extract next question from the test
+            //string nextQuestion = test.TestObject;
+
+            //string message = nextQuestion;
+
+            // Send answer to the user.
+            var resp = new ResponseObject(nextQuestion, model.UserId);
+
+            new RequestHandler().SendRequest(resp);
+            }
+            catch (System.Exception)
+            {
+                
+            }
+            return Ok("ok");
         }
 
-        private string GetNextQuestion(TestStatus status)
+        private string GetNextQuestion(Test test)
         {
             string result = string.Empty;
 
-            switch (status)
+            switch (test.Status)
             {
                 //case TestStatus.Undefined:
                 //	{

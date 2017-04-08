@@ -75,5 +75,17 @@ namespace NFBot.Models.CompabilityModel
         public string Question { get; set; }
 
         public List<AnswerModel> Answers { get; set; }
+
+        public override string ToString()
+        {
+            var message = Question;
+
+            foreach (var Answer in Answers)
+            {
+                message += Answer.Code + ") " + Answer.Value;
+            }
+
+            return message;
+        }
     }
 }

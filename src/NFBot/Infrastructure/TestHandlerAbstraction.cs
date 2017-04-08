@@ -24,5 +24,7 @@ namespace NFBot.Infrastructure
         public abstract string Analysis();
 
         public abstract List<int> SearchNewUsers(List<TestResult> testResults);
+
+        public abstract TestResult GetResults();
     }
 }

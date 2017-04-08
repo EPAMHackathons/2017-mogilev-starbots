@@ -23,6 +23,8 @@ namespace NFBot.Controllers
 
 		private IUserComponent userComponent = new UserComponent();
 
+		private TestResultComponent testResultComponent = new TestResultComponent();
+
 		#endregion
 
 		[HttpPost]
@@ -75,7 +77,7 @@ namespace NFBot.Controllers
 			}
 			else
 			{
-				nextQuestion = this.GetNextQuestion(test, model.Message);
+				nextQuestion = this.GetNextQuestion(test, model.Message, model.UserId);
 			}
 
 
@@ -93,7 +95,7 @@ namespace NFBot.Controllers
 			return Ok("ok");
 		}
 
-		private string GetNextQuestion(Test test, string message)
+		private string GetNextQuestion(Test test, string message, int userId)
 		{
 			string result = string.Empty;
 			TestStatus status;
@@ -110,8 +112,11 @@ namespace NFBot.Controllers
 					}
 				case TestStatus.Continue:
 					var handler = TestFactory.GetTestHandler(test.Code, test, null);
-
+					handler.AddNewAnswer(message);
 					result = handler.NextQuestion(out status);
+
+					this.testResultComponent.SaveResult(userId, test.Id, handler.GetResults());
+
 					break;
 				case TestStatus.IncorrectAnswer:
 					result = "Incorrect answer - please try again.";

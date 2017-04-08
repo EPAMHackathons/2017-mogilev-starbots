@@ -13,7 +13,7 @@ namespace NFBot.Models
     {
         public TestHandlerAbstraction GetTestHandler(string name, Test test, TestResult results)
         {
-            if(name == "знакомство")
+            if(name == "знакомства")
             {
                 return new CompabilityTestHandler(test, results);
             }

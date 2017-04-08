@@ -11,6 +11,7 @@ namespace NFBot.Controllers
 	using NFBot.Models.DatabaseModel;
 	using Models.CompabilityModel;
 	using Infrastructure.DBComponents;
+	using System.Linq;
 
 	#endregion
 
@@ -24,9 +25,19 @@ namespace NFBot.Controllers
 
 		#endregion
 
-		[HttpPost]
-		public async Task<IActionResult> NFFEnterPoint([FromBody]RequestModel model)
+		//[HttpPost]
+		public async Task<IActionResult> NFFEnterPoint(/*[FromBody]RequestModel model*/)
 		{
+			RequestModel model = new RequestModel
+			{
+				RequestObject = new RequestObject
+				{
+					Body = "знакомства",
+					UserId = 1
+				},
+				Type = "message_new"
+			};
+
 			// Handle only new messages.
 			if (model.Type != "message_new")
 			{
@@ -37,44 +48,73 @@ namespace NFBot.Controllers
 
 			// Save answer for user.
 			//this.testManagement.SaveAnswer(model.Message);
+			string nextQuestion = null;
 
 			Test test = this.testManagement.GetCurrentTest(model.UserId);
 
-			TestStatus newStatus;
-			string nextQuestion = null;
-
-			switch (test.Status)
+			if (test == null)
 			{
-				case TestStatus.Undefined:
-					{
-						Test newTest = this.testManagement.GetTestByCode(model.Message);
+				var tests = this.testManagement.GetAllTests();
 
-						if (newTest == null)
-						{
-							nextQuestion = "Incorrect choice. Please, try again.";
-						}
-						else
-						{
-							var handler = new Models.TestFactory().GetTestHandler(model.Message, newTest, null);
+				nextQuestion = string.Join("\n", tests.Select(t => t.Code));
+			}
+			else
+			{
+				nextQuestion = this.GetNextQuestion(test.Status);
+			}
+			TestStatus newStatus;
 
-							nextQuestion = handler.NextQuestion(out newStatus);
-						}
+			
 
-						//Test newTest = new Test { Code = model.Message, TestObject = TestModel.Init() };
+			// Extract next question from the test
+			//string nextQuestion = test.TestObject;
 
-						//var handler = new CompabilityTestHandler(newTest, null);
-						//handler.AddNewAnswer(model.Message);
+			//string message = nextQuestion;
 
-						//this.userComponent.SetupCurrentTest(model.UserId, test.Id);
+			// Send answer to the user.
+			var resp = new ResponseObject(nextQuestion, model.UserId);
 
-						//nextQuestion = handler.NextQuestion(out newStatus);
-						break;
-					}
+			await new RequestHandler().SendRequest(resp);
+
+			return Ok("ok");
+		}
+
+		private string GetNextQuestion(TestStatus status)
+		{
+			string result  = string.Empty;
+
+			switch (status)
+			{
+				//case TestStatus.Undefined:
+				//	{
+				//		Test newTest = this.testManagement.GetTestByCode(model.Message);
+
+				//		if (newTest == null)
+				//		{
+				//			nextQuestion = "Incorrect choice. Please, try again.";
+				//		}
+				//		else
+				//		{
+				//			var handler = new Models.TestFactory().GetTestHandler(model.Message, newTest, null);
+
+				//			nextQuestion = handler.NextQuestion(out newStatus);
+				//		}
+
+				//		//Test newTest = new Test { Code = model.Message, TestObject = TestModel.Init() };
+
+				//		//var handler = new CompabilityTestHandler(newTest, null);
+				//		//handler.AddNewAnswer(model.Message);
+
+				//		//this.userComponent.SetupCurrentTest(model.UserId, test.Id);
+
+				//		//nextQuestion = handler.NextQuestion(out newStatus);
+				//		break;
+				//	}
 				case TestStatus.Finished:
 					{
-						var handler = new CompabilityTestHandler(test, null);
+						//var handler = new CompabilityTestHandler(test, null);
 
-						string analysisResult = handler.Analysis();
+						//var analysisResult = handler.SearchNewUsers();
 
 						break;
 					}
@@ -82,23 +122,13 @@ namespace NFBot.Controllers
 
 					break;
 				case TestStatus.IncorrectAnswer:
-					nextQuestion = "Incorrect answer - please try again.";
+					result = "Incorrect answer - please try again.";
 					break;
 				default:
 					break;
 			}
 
-			// Extract next question from the test
-			//string nextQuestion = test.TestObject;
-
-			string message = "You said " + model.Message + nextQuestion;
-
-			// Send answer to the user.
-			var resp = new ResponseObject(message, model.UserId);
-
-			await new RequestHandler().SendRequest(resp);
-
-			return Ok("ok");
+			return result;
 		}
 
 		private void CheckUser(RequestModel model)

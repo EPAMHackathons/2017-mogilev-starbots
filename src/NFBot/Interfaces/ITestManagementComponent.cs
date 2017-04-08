@@ -16,5 +16,6 @@ namespace NFBot.Interfaces
 
 		ICollection<Test> GetAllTests();
 		Test GetCurrentTest(int userId);
+		void SaveAnswer(string body);
 	}
 }

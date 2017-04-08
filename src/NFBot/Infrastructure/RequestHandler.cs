@@ -13,7 +13,7 @@ namespace NFBot.Infrastructure
     {
         public async Task SendRequest(ResponseObject response)
         {
-            string url = string.Format(response.Url, response.Message, response.UserId, response.AccessToken, response.V);
+            string url = string.Format(response.Url, response.Message, response.UserId, response.AccessToken, response.Version);
 
             var client = new HttpClient();
             var responses = client.PostAsync(url, null);

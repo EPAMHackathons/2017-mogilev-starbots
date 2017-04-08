@@ -76,7 +76,8 @@ namespace NFBot.Controllers
 
 					TestHandlerAbstraction handler = TestFactory.GetTestHandler(model.Message, testByCode, null);
 						handler.AddNewAnswer(model.Message);
-						nextQuestion = handler.NextQuestion(out newStatus);
+                        testResultComponent.SaveResult(model.UserId, handler.GetResults());
+                        nextQuestion = handler.NextQuestion(out newStatus);
 				}
 			}
 			else
@@ -86,19 +87,34 @@ namespace NFBot.Controllers
 
 
 
-            // Extract next question from the test
-            //string nextQuestion = test.TestObject;
+                // Extract next question from the test
+                //string nextQuestion = test.TestObject;
 
-            //string message = nextQuestion;
+                //string message = nextQuestion;
 
-            // Send answer to the user.
-            var resp = new ResponseObject(nextQuestion, model.UserId);
+                // Send answer to the user.
+                if (nextQuestion.Length < 500) {
+                    var resp = new ResponseObject(nextQuestion, model.UserId);
 
-            new RequestHandler().SendRequest(resp);
+                    new RequestHandler().SendRequest(resp);
+                }
+                else {
+                    int itemsCount = nextQuestion.Length / 500;
+                    for (int i = 0; i < itemsCount; i++)
+                    {
+                        var resp1 = new ResponseObject(nextQuestion.Substring(i * 500, 500), model.UserId);
+
+                        new RequestHandler().SendRequest(resp1);
+                    }
+
+                    var resp = new ResponseObject(nextQuestion.Substring((itemsCount) * 500), model.UserId);
+
+                    new RequestHandler().SendRequest(resp);
+                }
             }
-            catch (System.Exception)
+            catch (System.Exception te)
             {
-                
+                string ee = te.Message;
             }
             return Ok("ok");
         }
@@ -106,27 +122,49 @@ namespace NFBot.Controllers
 		private string GetNextQuestion(Test test, string message, int userId)
 		{
 			string result = string.Empty;
-			TestStatus status;
+			TestStatus status = TestStatus.Continue;
 
-			switch (test.Status)
-			{
-				case TestStatus.Finished:
-					{
-						//var handler = new CompabilityTestHandler(test, null);
+            var res = testResultComponent.GetCurrentUserResult(userId);
 
-                        //var analysisResult = handler.SearchNewUsers();
+            var handler = TestFactory.GetTestHandler(test.Code, test, res);
 
-						break;
-					}
-				case TestStatus.Continue:
+            bool isCotrrect = handler.AddNewAnswer(message) == Models.Enumerations.AnswerStatus.Correct;
+            if (isCotrrect)
+            {
+                this.testResultComponent.SaveResult(userId, handler.GetResults());
 
-                    break;
-                case TestStatus.IncorrectAnswer:
-                    result = "Incorrect answer - please try again.";
-                    break;
-                default:
-                    break;
+                result = handler.NextQuestion(out status);
             }
+            else{
+                result = MessagesConstants.IncorrectAnswer;
+            }
+
+            if(status == TestStatus.Finished)
+            {
+                var userResults = testResultComponent.GetAllResults(test.Id);
+                result = string.Join("\n",handler.SearchNewUsers(result, userResults));
+                this.userComponent.SetupCurrentTest(userId, 0);
+            }
+
+            //switch (test.Status)
+            //{
+            //	case TestStatus.Finished:
+            //		{
+            //			//var handler = new CompabilityTestHandler(test, null);
+
+            //                     //var analysisResult = handler.SearchNewUsers();
+
+            //			break;
+            //		}
+            //	case TestStatus.Continue:
+
+            //                 break;
+            //             case TestStatus.IncorrectAnswer:
+            //                 result = "Incorrect answer - please try again.";
+            //                 break;
+            //             default:
+            //                 break;
+            //         }
 
             return result;
         }

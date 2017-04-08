@@ -104,13 +104,15 @@ namespace NFBot.Models.CompabilityModel
             {
                 string resultCode = Analysis();
                 string message = test.Description.Where(m => m.Code==resultCode).FirstOrDefault().Description;
-                message += "---Есть следующие комбинации. Выбери подходящую для себя.---";
-
+                message += "\n ---Есть следующие комбинации. Выбери подходящую для себя.--- \n\n\n";
+                int index = 0;
+                string[] answers = new string[] { "А", "Б", "В", "Г", "Д", "Е" };
                 foreach (var item in test.Compare)
                 {
                     if (item.Code.Contains(resultCode))
                     {
-                        message += item.Description;
+                        message += answers[index]+") "+item.Description +"\n\n";
+                        index++;
                     }
                 }
                 status = TestStatus.Continue;
@@ -119,7 +121,7 @@ namespace NFBot.Models.CompabilityModel
             else
             {
                 status = TestStatus.Finished;
-                return "тест завершен";
+                return results.Answers.Last().ToString();
             }
         }
 

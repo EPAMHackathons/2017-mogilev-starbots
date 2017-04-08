@@ -75,7 +75,7 @@ namespace NFBot.Controllers
 			}
 			else
 			{
-				nextQuestion = this.GetNextQuestion(test);
+				nextQuestion = this.GetNextQuestion(test, model.Message);
 			}
 
 
@@ -93,37 +93,13 @@ namespace NFBot.Controllers
 			return Ok("ok");
 		}
 
-		private string GetNextQuestion(Test test)
+		private string GetNextQuestion(Test test, string message)
 		{
 			string result = string.Empty;
+			TestStatus status;
 
 			switch (test.Status)
 			{
-				//case TestStatus.Undefined:
-				//	{
-				//		Test newTest = this.testManagement.GetTestByCode(model.Message);
-
-				//		if (newTest == null)
-				//		{
-				//			nextQuestion = "Incorrect choice. Please, try again.";
-				//		}
-				//		else
-				//		{
-				//			var handler = new Models.TestFactory().GetTestHandler(model.Message, newTest, null);
-
-				//			nextQuestion = handler.NextQuestion(out newStatus);
-				//		}
-
-				//		//Test newTest = new Test { Code = model.Message, TestObject = TestModel.Init() };
-
-				//		//var handler = new CompabilityTestHandler(newTest, null);
-				//		//handler.AddNewAnswer(model.Message);
-
-				//		//this.userComponent.SetupCurrentTest(model.UserId, test.Id);
-
-				//		//nextQuestion = handler.NextQuestion(out newStatus);
-				//		break;
-				//	}
 				case TestStatus.Finished:
 					{
 						//var handler = new CompabilityTestHandler(test, null);
@@ -133,7 +109,9 @@ namespace NFBot.Controllers
 						break;
 					}
 				case TestStatus.Continue:
+					var handler = TestFactory.GetTestHandler(test.Code, test, null);
 
+					result = handler.NextQuestion(out status);
 					break;
 				case TestStatus.IncorrectAnswer:
 					result = "Incorrect answer - please try again.";

@@ -28,7 +28,10 @@ namespace NFBot.Controllers
 			}
 
 			// Check whether user is exist. If not - create new.
-			this.testManagement.UpdateUser(model.RequestObject.UserId);
+			long internalId = this.testManagement.UpdateUser(model.RequestObject.UserId);
+
+			// Save answer for user.
+			this.testManagement.SaveAnswer(model.RequestObject.Body);
 
 			Test test = this.testManagement.GetCurrentTest(model.RequestObject.UserId);
 

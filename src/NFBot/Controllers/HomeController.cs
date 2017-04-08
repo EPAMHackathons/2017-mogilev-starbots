@@ -10,6 +10,7 @@ namespace NFBot.Controllers
     using NFBot.Models;
     using NFBot.Models.DatabaseModel;
     using Models.CompabilityModel;
+    using Models.MoveModel;
 
     #endregion
 
@@ -62,39 +63,39 @@ namespace NFBot.Controllers
 
         public string Index()
         {
-            CompabilityTestHandler handler = new CompabilityTestHandler(new Test() { Code = "", TestObject = TestModel.Init(), Id = 1, Name = "знакомства" }, null);
+            //CompabilityTestHandler handler = new CompabilityTestHandler(new Test() { Code = "", TestObject = TestModel.Init(), Id = 1, Name = "знакомства" }, null);
 
-            handler.AddNewAnswer("A");
-            TestStatus st;
-            string results = handler.NextQuestion(out st);
-            var res = handler.GetResults();
-            handler = new CompabilityTestHandler(new Test() { Code = "", TestObject = TestModel.Init(), Id = 1, Name = "знакомства" }, res);
+            //handler.AddNewAnswer("A");
+            //TestStatus st;
+            //string results = handler.NextQuestion(out st);
+            //var res = handler.GetResults();
+            //handler = new CompabilityTestHandler(new Test() { Code = "", TestObject = TestModel.Init(), Id = 1, Name = "знакомства" }, res);
 
-            handler.AddNewAnswer("А");
-            results = handler.NextQuestion(out st);
-            var res2 = handler.GetResults();
-            handler = new CompabilityTestHandler(new Test() { Code = "", TestObject = TestModel.Init(), Id = 1, Name = "знакомства" }, res2);
+            //handler.AddNewAnswer("А");
+            //results = handler.NextQuestion(out st);
+            //var res2 = handler.GetResults();
+            //handler = new CompabilityTestHandler(new Test() { Code = "", TestObject = TestModel.Init(), Id = 1, Name = "знакомства" }, res2);
 
-            handler.AddNewAnswer("А");
-            handler.NextQuestion(out st);
-            var res3 = handler.GetResults();
-            handler = new CompabilityTestHandler(new Test() { Code = "", TestObject = TestModel.Init(), Id = 1, Name = "знакомства" }, res3);
+            //handler.AddNewAnswer("А");
+            //handler.NextQuestion(out st);
+            //var res3 = handler.GetResults();
+            //handler = new CompabilityTestHandler(new Test() { Code = "", TestObject = TestModel.Init(), Id = 1, Name = "знакомства" }, res3);
 
-            handler.AddNewAnswer("А");
-            results = handler.NextQuestion(out st);
-            var res4 = handler.GetResults();
-            handler = new CompabilityTestHandler(new Test() { Code = "", TestObject = TestModel.Init(), Id = 1, Name = "знакомства" }, res4);
+            //handler.AddNewAnswer("А");
+            //results = handler.NextQuestion(out st);
+            //var res4 = handler.GetResults();
+            //handler = new CompabilityTestHandler(new Test() { Code = "", TestObject = TestModel.Init(), Id = 1, Name = "знакомства" }, res4);
 
-            handler.AddNewAnswer("А");
-            results = handler.NextQuestion(out st);
-            var res5 = handler.GetResults();
-            handler = new CompabilityTestHandler(new Test() { Code = "", TestObject = TestModel.Init(), Id = 1, Name = "знакомства" }, res5);
+            //handler.AddNewAnswer("А");
+            //results = handler.NextQuestion(out st);
+            //var res5 = handler.GetResults();
+            //handler = new CompabilityTestHandler(new Test() { Code = "", TestObject = TestModel.Init(), Id = 1, Name = "знакомства" }, res5);
 
-            handler.AddNewAnswer("А");
-            results = handler.NextQuestion(out st);
-            var res6 = handler.GetResults();
+            //handler.AddNewAnswer("А");
+            //results = handler.NextQuestion(out st);
+            //var res6 = handler.GetResults();
 
-            return "Complete0;";
+            return MoveTest.Int();
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using NFBot.Infrastructure;
 using NFBot.Models.CompabilityModel;
 using NFBot.Models.DatabaseModel;
+using NFBot.Models.MoveModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,12 @@ namespace NFBot.Models
             {
                 return new CompabilityTestHandler(test, results);
             }
+
+            if (name == "кино")
+            {
+                return new MoveTestHandler(test, results);
+            }
+
             return null;
         }
     }

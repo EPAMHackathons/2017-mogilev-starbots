@@ -70,6 +70,25 @@ namespace NFBot.Models.CompabilityModel
             return currentType;
         }
 
+        public string Analysis(TestResultModel model)
+        {
+            string currentType = "";
+            int maxValue = 0;
+            string[] answers = new string[] { "А", "Б", "В", "Г", "Д", "Е" };
+            foreach (var item in answers)
+            {
+                int i = model.Answers.Where(m => m == item.ToCharArray()[0]).Count();
+
+                if (i > maxValue)
+                {
+                    maxValue = i;
+                    currentType = item;
+                }
+            }
+
+            return currentType;
+        }
+
         public override string NextQuestion(out TestStatus status)
         {
             results = JsonConvert.DeserializeObject<TestResultModel>(this.testResultModel.Result);
@@ -103,9 +122,19 @@ namespace NFBot.Models.CompabilityModel
             }
         }
 
-        public override List<int> SearchNewUsers(List<TestResult> testResults)
+        public override List<string> SearchNewUsers(string code, List<TestResult> testResults)
         {
-            return new List<int>();
+            List<string> links = new List<string>();
+            string linkPattern = "https://vk.com/id";
+            foreach (var item in testResults)
+            {
+                if(Analysis(JsonConvert.DeserializeObject<TestResultModel>(item.Result)) == code)
+                {
+                    links.Add(linkPattern + item.UserId);
+                }
+            }
+
+            return links;
         }
 
         public override TestResult GetResults()

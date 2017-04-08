@@ -14,8 +14,6 @@ namespace NFBot.Interfaces
 
 		Test GetCurrentTest(int userId);
 
-		void SaveAnswer(string body);
-
 		Test GetTestByCode(string code);
 	}
 }

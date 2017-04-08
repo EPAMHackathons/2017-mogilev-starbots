@@ -12,15 +12,13 @@ namespace NFBot.Infrastructure
 
 	public class RequestHandler
 	{
-		public async Task SendRequest(ResponseObject response)
-		{
-			string url = string.Format(response.Url, response.Message, response.UserId, response.AccessToken, response.Version);
+        public void SendRequest(ResponseObject response)
+        {
+            string url = string.Format(response.Url, response.Message, response.UserId, response.AccessToken, response.Version);
 
-			var client = new HttpClient();
-			var responses = client.PostAsync(url, null);
-			var responseString = responses.Result.Content.ReadAsStringAsync();
-
-			Debug.WriteLine(responseString);
-		}
-	}
+            var client = new HttpClient();
+            var responses = client.PostAsync(url, null);
+            var responseString = responses.Result.Content.ReadAsStringAsync();
+        }
+    }
 }

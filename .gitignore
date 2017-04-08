@@ -1,0 +1,3 @@
+src/NFBot/obj/
+.vs/
+src/NFBot/bin/Debug/netcoreapp1.0/NFBot.deps.json
